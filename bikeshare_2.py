@@ -47,9 +47,8 @@ def load_data(city, month, day):
     # convert the Start Time column to datetime
     df['Start Time'] = pd.to_datetime(df['Start Time'])
 
-    # extract month and day of week from Start Time to create new columns
-    df['month'] = df['Start Time'].dt.month    
-    df['day_of_week'] = df['Start Time'].dt.weekday_name
+    # extract month and day of week from Start Time to create new columns and convert month int to month name
+    df['month'] = df['Start Time'].dt.month.apply(lambda x: calendar.month_name[x])
 
     # filter by month if applicable
     if month != 'all':
