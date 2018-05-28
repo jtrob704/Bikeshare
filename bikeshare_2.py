@@ -22,10 +22,10 @@ def get_filters():
     city = raw_input("Please choose one of the following cities  (Chicago, New York City, or Washington): ").lower()
 
     # get user input for month (all, january, february, ... , june)
-    month = raw_input("Please enter the month of the bikeshare data to view(January, February, March, April, May, June or all): ").lower()
+    month = raw_input("Please enter the month of the bikeshare data to view (January, February, March, April, May, June or all): ").lower()
 
     # get user input for day of week (all, monday, tuesday, ... sunday)
-    day = raw_input("Please enter the day of the week of the bikeshare data to view(Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday or all): ").lower()
+    day = raw_input("Please enter the day of the week of the bikeshare data to view (Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday or all): ").lower()
 
     print('-'*40)
     return city, month, day
@@ -47,8 +47,9 @@ def load_data(city, month, day):
     # convert the Start Time column to datetime
     df['Start Time'] = pd.to_datetime(df['Start Time'])
 
-    # extract month and day of week from Start Time to create new columns and convert month int to month name
-    df['month'] = df['Start Time'].dt.month.apply(lambda x: calendar.month_name[x])
+    # extract month and day of week from Start Time to create new columns
+    df['month'] = df['Start Time'].dt.month    
+    df['day_of_week'] = df['Start Time'].dt.weekday_name
 
     # filter by month if applicable
     if month != 'all':
@@ -73,38 +74,30 @@ def time_stats(df):
     print('\nCalculating The Most Frequent Times of Travel...\n')
     start_time = time.time()
 
-    # display the most common month
-    # extract month from the Start Time column to create a month column
-    df['month'] = df['Start Time'].dt.month
-    df['month'] = df['month'].apply(lambda x: calendar.month_name[x])
+    # extract month from the Start Time column to create a month column and convert month in to month name
+    df['month'] = df['Start Time'].dt.month.apply(lambda x: calendar.month_name[x])
 
     # find the most common month
-    common_month = df['month'].mode()[0]
+    common_month = df['month'].mode()[0]     
     
     print('Most Common month', common_month)
     
-    print("\nThis took %s seconds." % (time.time() - start_time))
-    print('-'*40)
-
-    # display the most common day of the week
     # extract day from the Start Time column to create a day column
     df['day_of_week'] = df['Start Time'].dt.weekday_name
 
     # find the most common day of the week
     common_day = df['day_of_week'].mode()[0]
 
+    # display the most common day of the week
     print('Most Common day', common_day)
 
-    print("\nThis took %s seconds." % (time.time() - start_time))
-    print('-'*40)  
-
-    # display the most common start hour
     # extract hour from the Start Time column to create an hour column
     df['hour'] = df['Start Time'].dt.hour
 
     # find the most common hour
     common_hour = df['hour'].mode()[0]
 
+    # display the most common start hour
     print('Most Common Start Hour:', common_hour)
 
     print("\nThis took %s seconds." % (time.time() - start_time))
@@ -117,14 +110,28 @@ def station_stats(df):
     print('\nCalculating The Most Popular Stations and Trip...\n')
     start_time = time.time()
 
+    # extract month from the Start Station column to create a station column
+    df['start_station'] = df['Start Station'] 
+
+    # find the most common Start Station
+    common_start = df['start_station'].mode()[0]
+
     # display most commonly used start station
+    print('Most common start station', common_start)
 
+    # extract month from the End Station column to create a station column
+    df['end_station'] = df['End Station']
 
-    # display most commonly used end station
+    # find the most commonly used end station
+    common_end = df['end_station'].mode()[0]
 
+    # display most commonly used start station
+    print('Most common end station', common_end)
 
     # display most frequent combination of start station and end station trip
+    freq_comb = df.groupby(['start_station', 'end_station']).size().sort_values(ascending=False).head(1)
 
+    print('The most frequent combination of start station and end station is: \n', freq_comb)
 
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
